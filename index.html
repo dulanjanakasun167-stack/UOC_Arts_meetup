@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratnapura to UOC Arts - Batch Meetup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            background: rgba(252, 0, 255, 0.15);
+            border: 1px solid #fc00ff;
+            color: #ffb3ff;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #00dbde;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* Ticket Style */
+        .ticket {
+            margin-top: 15px;
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            border: 2px dashed rgba(255,255,255,0.4);
+        }
+
+        .route-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* Info Grid */
+        .info-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.04);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            flex: 1;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .edit-btn {
+            background: transparent;
+            border: 1px solid #64748b;
+            color: #94a3b8;
+            padding: 4px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+
+        /* Batch Wall Messages */
+        .wall-feed {
+            max-height: 140px;
+            overflow-y: auto;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sticky-note {
+            background: rgba(0, 219, 222, 0.1);
+            border: 1px solid rgba(0, 219, 222, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .sticky-note strong {
+            color: #00dbde;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>රත්නපුරෙන් කොළඹට 🚀</h1>
+            <p class="subtitle">UOC Faculty of Arts - Batch Meetup</p>
+            <div class="status-badge">⏳ Date & Venue: Coming Soon (ළඟදීම දැනුම් දෙනු ලැබේ)</div>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <div class="grid-layout">
+            
+            <!-- Left Box: Ticket Generator -->
+            <div class="card-box">
+                <h3>🎫 Digital Meetup Pass</h3>
+                <input type="text" id="username" placeholder="ඔයාගේ නම (Enter your name)...">
+                <button class="btn" onclick="generateTicket()">Generate Pass</button>
+
+                <div id="userTicket" class="ticket">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                        <span><strong>UOC ARTS</strong></span>
+                        <span>VIP PASS</span>
+                    </div>
+                    <p style="font-size: 0.8rem;">Passenger: <strong id="displayName"></strong></p>
+                    <div class="route-box">
+                        <span>RNP (රත්නපුර)</span>
+                        <span>✈️ ➔</span>
+                        <span>UOC (කොළඹ)</span>
+                    </div>
+                    <p style="font-size: 0.75rem;">Status: Confirmed ✅</p>
+                </div>
+            </div>
+
+            <!-- Right Box: Meetup Details -->
+            <div class="card-box">
+                <h3>📍 Meetup Details</h3>
+                <div class="info-row">
+                    <div class="info-card">
+                        <span style="color:#00dbde; font-weight:600;">දිනය:</span>
+                        <p id="event-date" style="font-size:0.8rem;">TBD</p>
+                    </div>
+                    <div class="info-card">
+                        <span style="color:#00dbde; font-weight:600;">වෙලාව:</span>
+                        <p id="event-time" style="font-size:0.8rem;">TBD</p>
+                    </div>
+                </div>
+                <div class="info-card" style="margin-bottom: 8px;">
+                    <span style="color:#00dbde; font-weight:600;">ස්ථානය:</span>
+                    <p id="event-location" style="font-size:0.8rem;">රත්නපුර (ඉ ඉක්මනින් දන්වනු ලැබේ)</p>
+                </div>
+                <button class="edit-btn" onclick="editDetails()">✏️ Update Details</button>
+            </div>
+
+            <!-- Full Width Box: Batch Wall -->
+            <div class="card-box" style="grid-column: span 2;">
+                <h3>💬 Batch Wall (පණිවිඩ පුවරුව)</h3>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="wallName" placeholder="නම..." style="flex: 1;">
+                    <input type="text" id="wallMsg" placeholder="පණිවිඩය..." style="flex: 2;">
+                    <button class="btn" onclick="addNote()" style="width: auto; padding: 10px 20px; margin-top: 8px;">Post</button>
+                </div>
+                <div class="wall-feed" id="wallContainer">
+                    <div class="sticky-note">
+                        <strong>Admin ✨:</strong> රත්නපුරෙන් කොළඹ Arts තේරුණු හැමෝටම සුබ පැතුම්!
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 3D Background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const geometry = new THREE.BufferGeometry();
+        const count = 1500;
+        const positions = new Float32Array(count * 3);
+        for(let i = 0; i < count * 3; i++) { positions[i] = (Math.random() - 0.5) * 50; }
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({ color: 0x00dbde, size: 0.1 });
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+        camera.position.z = 15;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Ticket Generator
+        function generateTicket() {
+            const name = document.getElementById('username').value;
+            if(name.trim() === "") { alert("නම ඇතුළත් කරන්න!"); return; }
+            document.getElementById('displayName').innerText = name;
+            document.getElementById('userTicket').style.display = 'block';
+        }
+
+        // Batch Wall
+        function addNote() {
+            const name = document.getElementById('wallName').value;
+            const msg = document.getElementById('wallMsg').value;
+            if(name.trim() === "" || msg.trim() === "") { alert("නම සහ පණිවිඩය දෙකම දෙන්න!"); return; }
+
+            const wall = document.getElementById('wallContainer');
+            const note = document.createElement('div');
+            note.className = 'sticky-note';
+            note.innerHTML = `<strong>${name}:</strong> ${msg}`;
+            wall.prepend(note);
+
+            document.getElementById('wallName').value = "";
+            document.getElementById('wallMsg').value = "";
+        }
+
+        // Edit Details
+        function editDetails() {
+            const newDate = prompt("දිනය:", document.getElementById('event-date').innerText);
+            if(newDate) document.getElementById('event-date').innerText = newDate;
+            const newTime = prompt("වෙලාව:", document.getElementById('event-time').innerText);
+            if(newTime) document.getElementById('event-time').innerText = newTime;
+            const newLoc = prompt("ස්ථානය:", document.getElementById('event-location').innerText);
+            if(newLoc) document.getElementById('event-location').innerText = newLoc;
+        }
+    </script>
+</body>
+</html>
